@@ -5,6 +5,8 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 router.register('notes', NoteViewSet, base_name='notes')
+router.register('users', UserViewSet, base_name='users')
+
 urlpatterns = router.urls
 
 # notes_list = NoteViewSet.as_view({
