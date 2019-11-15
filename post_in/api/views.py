@@ -6,11 +6,16 @@ from .serializers import NoteSerializer, ThinNoteSerializer
 from rest_framework.views import APIView
 from rest_framework.mixins import ListModelMixin, CreateModelMixin, RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.generics import GenericAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from .permissions import IsAuthorOrReadOnly
 
 
-class NotesListView(ListCreateAPIView):
+class NoteViewSet(ModelViewSet):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+    permission_classes = (IsAuthorOrReadOnly,)
+    #http_method_names = ['get', 'post']
 
     def list(self, request, *args, **kwargs):
         notes = Note.objects.all()
@@ -18,10 +23,25 @@ class NotesListView(ListCreateAPIView):
         serializer = ThinNoteSerializer(notes, many=True, context=context)
         return Response(serializer.data)
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
-class NoteDetailView(RetrieveUpdateDestroyAPIView):
-    queryset = Note.objects.all()
-    serializer_class = NoteSerializer
+
+
+# class NotesListView(ListCreateAPIView):
+#     queryset = Note.objects.all()
+#     serializer_class = NoteSerializer
+#
+#     def list(self, request, *args, **kwargs):
+#         notes = Note.objects.all()
+#         context = {'request': request}
+#         serializer = ThinNoteSerializer(notes, many=True, context=context)
+#         return Response(serializer.data)
+#
+#
+# class NoteDetailView(RetrieveUpdateDestroyAPIView):
+#     queryset = Note.objects.all()
+#     serializer_class = NoteSerializer
 
 
 # Create your views here.
